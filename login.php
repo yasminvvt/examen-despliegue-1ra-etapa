@@ -5,7 +5,8 @@ require_once 'db_connection.php';
 
 $response = array(
     'success' => false,
-    'message' => ''
+    'message' => '',
+    'redirect' => ''
 );
 
 $data = json_decode(file_get_contents('php://input'), true);
@@ -19,28 +20,22 @@ if (empty($username) || empty($password)) {
 }
 
 try {
-    $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt = $pdo->prepare("SELECT id, username, password FROM users WHERE username = ?");
+    $stmt->execute([$username]);
+    $user = $stmt->fetch();
 
-    if ($result->num_rows === 1) {
-        $user = $result->fetch_assoc();
-        if (password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $response['success'] = true;
-            $response['message'] = 'Login exitoso';
-        } else {
-            $response['message'] = 'Contraseña incorrecta';
-        }
+    if ($user && password_verify($password, $user['password'])) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+        $response['success'] = true;
+        $response['message'] = 'Login exitoso';
+        $response['redirect'] = 'pagina.html';
     } else {
-        $response['message'] = 'Usuario no encontrado';
+        $response['message'] = 'Usuario o contraseña incorrectos';
     }
 } catch (Exception $e) {
     $response['message'] = 'Error al iniciar sesión';
 }
 
-$conn->close();
 echo json_encode($response);
 ?> 

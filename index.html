@@ -16,11 +16,13 @@
             </div>
         </div>
         <form id="student-form">
+            <input type="hidden" id="student-id">
             <input type="text" id="nombre" placeholder="Nombre" required>
             <input type="text" id="apellido" placeholder="Apellido" required>
             <input type="text" id="curso" placeholder="Curso" required>
             <input type="email" id="email" placeholder="Email" required>
             <button type="submit" id="submit-btn">Agregar</button>
+            <button type="button" id="cancel-btn" style="display: none;">Cancelar</button>
         </form>
         <table>
             <thead>
@@ -29,6 +31,7 @@
                     <th>Apellido</th>
                     <th>Curso</th>
                     <th>Email</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody id="student-table-body">
@@ -57,6 +60,8 @@
         const form = document.getElementById('student-form');
         const tableBody = document.getElementById('student-table-body');
         const submitBtn = document.getElementById('submit-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const studentIdInput = document.getElementById('student-id');
 
         async function fetchStudents() {
             try {
@@ -80,7 +85,7 @@
             tableBody.innerHTML = '';
             if (students.length === 0) {
                 const row = document.createElement('tr');
-                row.innerHTML = '<td colspan="4" style="text-align: center;">No hay estudiantes registrados</td>';
+                row.innerHTML = '<td colspan="5" style="text-align: center;">No hay estudiantes registrados</td>';
                 tableBody.appendChild(row);
                 return;
             }
@@ -91,6 +96,10 @@
                     <td>${student.apellido}</td>
                     <td>${student.curso}</td>
                     <td>${student.email}</td>
+                    <td>
+                        <button onclick="editStudent(${student.id}, '${student.nombre}', '${student.apellido}', '${student.curso}', '${student.email}')" class="edit-btn">Editar</button>
+                        <button onclick="deleteStudent(${student.id})" class="delete-btn">Eliminar</button>
+                    </td>
                 `;
                 tableBody.appendChild(row);
             });
@@ -100,14 +109,58 @@
             alert(message);
         }
 
+        async function editStudent(id, nombre, apellido, curso, email) {
+            studentIdInput.value = id;
+            document.getElementById('nombre').value = nombre;
+            document.getElementById('apellido').value = apellido;
+            document.getElementById('curso').value = curso;
+            document.getElementById('email').value = email;
+            submitBtn.textContent = 'Actualizar';
+            cancelBtn.style.display = 'inline-block';
+        }
+
+        async function deleteStudent(id) {
+            if (confirm('¿Está seguro de que desea eliminar este estudiante?')) {
+                try {
+                    const response = await fetch('delete_student.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id: id })
+                    });
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showMessage(result.message, 'success');
+                        fetchStudents();
+                    } else {
+                        showMessage(result.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error al eliminar estudiante:', error);
+                    showMessage('Error de conexión al servidor', 'error');
+                }
+            }
+        }
+
+        cancelBtn.onclick = function() {
+            form.reset();
+            studentIdInput.value = '';
+            submitBtn.textContent = 'Agregar';
+            cancelBtn.style.display = 'none';
+        };
+
         form.onsubmit = async function(e) {
             e.preventDefault();
+            const id = studentIdInput.value;
             const nombre = document.getElementById('nombre').value.trim();
             const apellido = document.getElementById('apellido').value.trim();
             const curso = document.getElementById('curso').value.trim();
             const email = document.getElementById('email').value.trim();
             
             const formData = new FormData();
+            formData.append('id', id);
             formData.append('nombre', nombre);
             formData.append('apellido', apellido);
             formData.append('curso', curso);
@@ -117,7 +170,8 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Enviando...';
                 
-                const response = await fetch('add_student.php', {
+                const url = id ? 'update_student.php' : 'add_student.php';
+                const response = await fetch(url, {
                     method: 'POST',
                     body: formData
                 });
@@ -126,6 +180,9 @@
                 if (result.success) {
                     showMessage(result.message, 'success');
                     form.reset();
+                    studentIdInput.value = '';
+                    submitBtn.textContent = 'Agregar';
+                    cancelBtn.style.display = 'none';
                     fetchStudents();
                 } else {
                     showMessage(result.message, 'error');
@@ -135,7 +192,7 @@
                 showMessage('Error de conexión al servidor', 'error');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Agregar';
+                submitBtn.textContent = id ? 'Actualizar' : 'Agregar';
             }
         }
 

@@ -7,8 +7,8 @@
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
-    background: #f4f4f4;
-    margin: 0; /**/
+    background: #fff56e;
+    margin: 0;
     padding: 20px;
 }
 
@@ -26,6 +26,10 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    padding: 10px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .user-info {
@@ -48,7 +52,7 @@ input {
 
 button {
     padding: 10px;
-    background: #4CAF50;
+    background: #0d1941;
     color: white;
     border: none;
     border-radius: 4px;
@@ -56,7 +60,7 @@ button {
 }
 
 button:hover {
-    background: #45a049;
+    background: #1a2a5e;
 }
 
 button:disabled {
@@ -68,6 +72,10 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 th, td {
@@ -77,8 +85,39 @@ th, td {
 }
 
 th {
-    background-color: #f8f9fa;
+    background-color: #0d1941;
+    color: white;
     font-weight: bold;
+}
+
+.edit-btn, .delete-btn {
+    padding: 6px 12px;
+    margin: 0 4px;
+    font-size: 14px;
+}
+
+.edit-btn {
+    background: #0d1941;
+}
+
+.edit-btn:hover {
+    background: #1a2a5e;
+}
+
+.delete-btn {
+    background: #e74c3c;
+}
+
+.delete-btn:hover {
+    background: #c0392b;
+}
+
+#cancel-btn {
+    background: #9e9e9e;
+}
+
+#cancel-btn:hover {
+    background: #757575;
 }
 
 .error-message {
@@ -103,6 +142,7 @@ th {
 .login-container h1, .register-container h1 {
     text-align: center;
     margin-bottom: 20px;
+    color: #0d1941;
 }
 
 .login-container form, .register-container form {
@@ -119,7 +159,7 @@ th {
 
 .login-container button, .register-container button {
     padding: 12px;
-    background: #4CAF50;
+    background: #0d1941;
     color: white;
     border: none;
     border-radius: 4px;
@@ -128,7 +168,7 @@ th {
 }
 
 .login-container button:hover, .register-container button:hover {
-    background: #45a049;
+    background: #1a2a5e;
 }
 
 .login-container p, .register-container p {
@@ -137,7 +177,7 @@ th {
 }
 
 .login-container a, .register-container a {
-    color: #4CAF50;
+    color: #0d1941;
     text-decoration: none;
 }
 

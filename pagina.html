@@ -7,21 +7,96 @@
   <link rel="stylesheet" href="pagina.css">
 </head>
 <body>
-  <h1 id="titulo">Colegio Tecnico Privado IDT</h1>
-  <a href="#info" class="link">Ir a la Información</a>
+  <div class="header">
+    <h1 id="titulo">Colegio Tecnico Privado IDT</h1>
+    <div class="user-info">
+      <span id="username-display"></span>
+      <a href="logout.php" class="logout-btn">Cerrar Sesión</a>
+    </div>
+  </div>
+
+  <div class="navigation">
+    <a href="#info" class="link">Ir a la Información</a>
+  </div>
 
   <div id="info" class="contenido">
+    <h2>Bienvenidos al Colegio Técnico Privado IDT</h2>
+    
+    <h3>Nuestra Misión</h3>
     <p>
-      Esta es una sección extensa de información. Aquí puedes escribir todo lo que quieras.
-      Puedes hablar sobre ti, sobre un tema importante, un proyecto, o lo que se te ocurra.
-      <br><br>
-      Esta sección puede contener varios párrafos. Si deseas separar ideas, puedes usar saltos de línea.
-      También podrías incluir listas, tablas, etc.
+      Formar profesionales técnicos con excelencia académica, valores éticos y morales, 
+      capaces de contribuir al desarrollo de la sociedad con responsabilidad y compromiso.
+    </p>
+
+    <h3>Nuestra Visión</h3>
+    <p>
+      Ser una institución educativa líder en la formación técnica, reconocida por su calidad 
+      académica y la excelencia de sus egresados en el ámbito profesional.
+    </p>
+
+    <h3>Oferta Académica</h3>
+    <ul>
+      <li>Técnico en Informática</li>
+      <li>Técnico en Administración</li>
+      <li>Técnico en Contabilidad</li>
+      <li>Técnico en Electrónica</li>
+    </ul>
+
+    <h3>Instalaciones</h3>
+    <p>
+      Contamos con modernas instalaciones equipadas con la última tecnología:
+    </p>
+    <ul>
+      <li>Laboratorios de cómputo</li>
+      <li>Biblioteca digital</li>
+      <li>Salones multimedia</li>
+      <li>Áreas deportivas</li>
+      <li>Espacios de recreación</li>
+    </ul>
+
+    <h3>Horarios de Atención</h3>
+    <p>
+      Lunes a Viernes: 7:00 AM - 6:00 PM<br>
+      Sábados: 8:00 AM - 12:00 PM
+    </p>
+
+    <h3>Contacto</h3>
+    <p>
+      Dirección: Av. Principal #123, Ciudad<br>
+      Teléfono: (123) 456-7890<br>
+      Email: info@colegioidt.edu<br>
+      WhatsApp: +123 456 7890
     </p>
   </div>
 
   <div class="imagen">
-    <img src="https://via.placeholder.com/400x300" alt="Imagen de ejemplo">
+    <img src="img/imagen alumnos.jpg.jpeg" alt="Estudiantes del Colegio Técnico Privado IDT">
   </div>
+
+  <div class="bottom-navigation">
+    <a href="index.html" class="nav-btn">Gestión de Estudiantes</a>
+  </div>
+
+  <script>
+    // Verificar sesión al cargar la página
+    async function checkSession() {
+      try {
+        const response = await fetch('check_session.php');
+        const data = await response.json();
+        
+        if (!data.logged_in) {
+          window.location.href = 'login.html';
+        } else {
+          document.getElementById('username-display').textContent = `Bienvenido, ${data.username}`;
+        }
+      } catch (error) {
+        console.error('Error al verificar sesión:', error);
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Verificar sesión al iniciar
+    checkSession();
+  </script>
 </body>
 </html>

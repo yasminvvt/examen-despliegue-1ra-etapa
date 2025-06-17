@@ -8,12 +8,13 @@ $response = array(
 );
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id = trim($_POST['id'] ?? '');
     $nombre = trim($_POST['nombre'] ?? '');
     $apellido = trim($_POST['apellido'] ?? '');
     $curso = trim($_POST['curso'] ?? '');
     $email = trim($_POST['email'] ?? '');
 
-    if (empty($nombre) || empty($apellido) || empty($curso) || empty($email)) {
+    if (empty($id) || empty($nombre) || empty($apellido) || empty($curso) || empty($email)) {
         $response['message'] = 'Por favor complete todos los campos';
         echo json_encode($response);
         exit;
@@ -26,25 +27,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        $stmt = $pdo->prepare("SELECT id FROM students WHERE email = ?");
-        $stmt->execute([$email]);
+        // Verificar si el email ya existe en otro registro
+        $stmt = $pdo->prepare("SELECT id FROM students WHERE email = ? AND id != ?");
+        $stmt->execute([$email, $id]);
         
         if ($stmt->rowCount() > 0) {
-            $response['message'] = 'El email ya está registrado';
+            $response['message'] = 'El email ya está registrado en otro estudiante';
             echo json_encode($response);
             exit;
         }
 
-        $stmt = $pdo->prepare("INSERT INTO students (nombre, apellido, curso, email) VALUES (?, ?, ?, ?)");
+        $stmt = $pdo->prepare("UPDATE students SET nombre = ?, apellido = ?, curso = ?, email = ? WHERE id = ?");
         
-        if ($stmt->execute([$nombre, $apellido, $curso, $email])) {
+        if ($stmt->execute([$nombre, $apellido, $curso, $email, $id])) {
             $response['success'] = true;
-            $response['message'] = 'Estudiante agregado exitosamente';
+            $response['message'] = 'Estudiante actualizado exitosamente';
         } else {
-            throw new Exception("Error al agregar estudiante");
+            throw new Exception("Error al actualizar estudiante");
         }
     } catch (Exception $e) {
-        $response['message'] = 'Error al agregar estudiante';
+        $response['message'] = 'Error al actualizar estudiante';
     }
 }
 

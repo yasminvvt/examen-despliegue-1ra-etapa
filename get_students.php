@@ -9,23 +9,16 @@ $response = array(
 );
 
 try {
-    $result = $conn->query("SELECT * FROM students ORDER BY id DESC");
+    $stmt = $pdo->query("SELECT * FROM students ORDER BY id DESC");
+    $response['data'] = $stmt->fetchAll();
+    $response['success'] = true;
     
-    if ($result) {
-        while ($row = $result->fetch_assoc()) {
-            $response['data'][] = $row;
-        }
-        $response['success'] = true;
-        if (empty($response['data'])) {
-            $response['message'] = 'No hay estudiantes registrados';
-        }
-    } else {
-        throw new Exception("Error al obtener estudiantes");
+    if (empty($response['data'])) {
+        $response['message'] = 'No hay estudiantes registrados';
     }
 } catch (Exception $e) {
     $response['message'] = 'Error al obtener estudiantes';
 }
 
-$conn->close();
 echo json_encode($response);
 ?> 
