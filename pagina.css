@@ -1,0 +1,42 @@
+body {
+    background-color: #fff56e; /* Color de fondo lila claro */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+  }
+  
+  h1 {
+    text-align: center;
+    color: #0d1941; /**/
+  }
+  
+  .link {
+    display: block;
+    text-align: center;
+    margin: 10px 0 30px 0;
+    color:  #0d1941;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  
+  .link:hover {
+    text-decoration: underline;
+  }
+  
+  .contenido {
+    max-width: 800px;
+    margin: 0 auto 40px auto;
+    line-height: 1.6;
+    font-size: 1.1em;
+  }
+  
+  .imagen {
+    text-align: center;
+  }
+  
+  .imagen img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
