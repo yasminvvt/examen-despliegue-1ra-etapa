@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colegio Tecninico Privado IDT</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Colegio Tecninico Privado IDT</h1>
+            <div class="user-info">
+                <span id="username-display"></span>
+                <a href="logout.php" class="logout-btn">Cerrar Sesión</a>
+            </div>
+        </div>
+        <form id="student-form">
+            <input type="text" id="nombre" placeholder="Nombre" required>
+            <input type="text" id="apellido" placeholder="Apellido" required>
+            <input type="text" id="curso" placeholder="Curso" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <button type="submit" id="submit-btn">Agregar</button>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Curso</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody id="student-table-body">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Verificar sesión al cargar la página
+        async function checkSession() {
+            try {
+                const response = await fetch('check_session.php');
+                const data = await response.json();
+                
+                if (!data.logged_in) {
+                    window.location.href = 'login.html';
+                } else {
+                    document.getElementById('username-display').textContent = `Bienvenido, ${data.username}`;
+                }
+            } catch (error) {
+                console.error('Error al verificar sesión:', error);
+                window.location.href = 'login.html';
+            }
+        }
+
+        const form = document.getElementById('student-form');
+        const tableBody = document.getElementById('student-table-body');
+        const submitBtn = document.getElementById('submit-btn');
+
+        async function fetchStudents() {
+            try {
+                const response = await fetch('get_students.php');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+                if (result.success) {
+                    renderTable(result.data);
+                } else {
+                    showMessage(result.message || 'Error al cargar estudiantes', 'error');
+                }
+            } catch (error) {
+                console.error('Error al obtener estudiantes:', error);
+                showMessage('Error de conexión al servidor', 'error');
+            }
+        }
+
+        function renderTable(students) {
+            tableBody.innerHTML = '';
+            if (students.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="4" style="text-align: center;">No hay estudiantes registrados</td>';
+                tableBody.appendChild(row);
+                return;
+            }
+            students.forEach((student) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.nombre}</td>
+                    <td>${student.apellido}</td>
+                    <td>${student.curso}</td>
+                    <td>${student.email}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function showMessage(message, type = 'info') {
+            alert(message);
+        }
+
+        form.onsubmit = async function(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('nombre').value.trim();
+            const apellido = document.getElementById('apellido').value.trim();
+            const curso = document.getElementById('curso').value.trim();
+            const email = document.getElementById('email').value.trim();
+            
+            const formData = new FormData();
+            formData.append('nombre', nombre);
+            formData.append('apellido', apellido);
+            formData.append('curso', curso);
+            formData.append('email', email);
+
+            try {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Enviando...';
+                
+                const response = await fetch('add_student.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage(result.message, 'success');
+                    form.reset();
+                    fetchStudents();
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error al enviar datos:', error);
+                showMessage('Error de conexión al servidor', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Agregar';
+            }
+        }
+
+        // Verificar sesión y cargar estudiantes al iniciar
+        checkSession();
+        fetchStudents();
+    </script>
+</body>
+</html>
